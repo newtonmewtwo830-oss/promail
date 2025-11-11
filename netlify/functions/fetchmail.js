@@ -1,48 +1,33 @@
-// netlify/functions/fetchMail.js
-export async function handler(event) {
-  const target = event.queryStringParameters.url;
+import fetch from "node-fetch";
 
-  if (!target) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Missing URL parameter" }),
-    };
-  }
-
+export const handler = async (event) => {
   try {
-    // ✅ Allow public temp mail APIs
-    const allowedHosts = ["www.1secmail.com", "api.mail.tm"];
-    const parsed = new URL(target);
+    const { url } = event.queryStringParameters;
 
-    if (!allowedHosts.includes(parsed.hostname)) {
+    if (!url) {
       return {
-        statusCode: 403,
-        body: JSON.stringify({ error: "Domain not allowed" }),
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing URL" }),
       };
     }
 
-    // ✅ Fetch the data
-    const response = await fetch(target, {
-      headers: { "User-Agent": "ProMail-Netlify-Proxy" },
-    });
-
+    console.log("Fetching:", url);
+    const response = await fetch(url);
     const text = await response.text();
 
-    // ✅ Return the result safely with CORS enabled
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
       },
       body: text,
     };
   } catch (err) {
-    console.error("Proxy error:", err);
+    console.error("Fetch error:", err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: "Server error", details: err.message }),
     };
   }
-}
+};
