@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProMail – Free Temporary Email</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- SEO meta -->
+  <meta name="description" content="ProMail gives you instant disposable inboxes. No signup, no spam, free forever.">
+  <meta name="keywords" content="temporary email, disposable email, temp mail, free inbox, privacy">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://promail.netlify.app/">
+
+  <!-- Link your own files -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors">
+  <header class="bg-blue-600 text-white py-4 shadow-md">
+    <h1 class="text-3xl font-bold">ProMail</h1>
+    <p class="text-sm opacity-90">Free, instant, disposable inbox</p>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 mt-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h2 class="text-xl font-semibold mb-1">Your Temporary Email</h2>
+        <div class="flex gap-2 items-center">
+          <span id="email-address" class="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded select-all">Generating...</span>
+          <button id="copy-btn" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Copy</button>
+        </div>
+      </div>
+
+      <div class="mt-4 md:mt-0">
+  <label class="text-sm mr-2" for="customName">Custom username:</label>
+  <input id="customName" type="text" placeholder="optional"
+         class="px-2 py-1 border rounded bg-gray-50 dark:bg-gray-800">
+  <button id="gen-btn"
+          class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 ml-2">
+    Generate
+  </button>
+</div>
+
+
+    <!-- Inbox area -->
+    <div class="mt-10">
+      <h3 class="text-lg font-semibold mb-2">Inbox</h3>
+      <ul id="message-list"
+          class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-md shadow">
+        <li class="p-3 text-gray-400 italic">Waiting for messages...</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="mt-10 text-sm text-gray-500 text-center py-6 border-t border-gray-200 dark:border-gray-700">
+    © 2025 ProMail
+    <button id="theme-toggle"
+            class="ml-3 bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">🌙</button>
+  </footer>
+
+  <!-- link the JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
