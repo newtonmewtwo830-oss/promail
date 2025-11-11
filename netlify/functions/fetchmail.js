@@ -1,31 +1,43 @@
-// ------------------ Create Inbox ------------------
-async function createInbox(custom = "") {
-  emailAddress.textContent = "Generating...";
-  messageList.innerHTML = `<li class="p-3 text-gray-400 italic">Waiting for messages...</li>`;
-
-  const randomName =
-    custom && custom.trim() !== ""
-      ? custom.trim()
-      : Math.random().toString(36).substring(2, 10);
-
+// netlify/functions/fetchmail.js
+export async function handler(event, context) {
   try {
-    // ✅ use reliable open CORS proxy
-    const corsProxy = "https://api.allorigins.win/raw?url=";
-    const apiUrl = `https://www.1secmail.com/api/v1/?action=genRandomMailbox`;
-    const fullUrl = `${corsProxy}${encodeURIComponent(apiUrl)}`;
+    const url = event.queryStringParameters.url;
 
-    const res = await fetch(fullUrl);
-    const data = await res.json();
-
-    if (!Array.isArray(data) || !data[0]) {
-      throw new Error("Invalid response");
+    if (!url) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing URL parameter" }),
+      };
     }
 
-    address = data[0];
-    emailAddress.textContent = address;
-    console.log("Generated address:", address);
-  } catch (err) {
-    console.error("Error generating email:", err);
-    emailAddress.textContent = "Error generating email.";
+    const response = await fetch(url);
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        body: JSON.stringify({ error: `Request failed with ${response.status}` }),
+      };
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      return {
+        statusCode: 200,
+        body: JSON.stringify(data),
+      };
+    } else {
+      const text = await response.text();
+      return {
+        statusCode: 200,
+        body: text,
+      };
+    }
+  } catch (error) {
+    console.error("FetchMail Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 }
