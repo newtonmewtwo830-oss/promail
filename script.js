@@ -22,7 +22,7 @@ async function createInbox() {
   try {
     // Call our Netlify proxy function (no CORS issues)
     const url = `https://www.1secmail.com/api/v1/?action=genRandomMailbox`;
-    const proxyUrl = `/.netlify/functions/fetchMail?url=${encodeURIComponent(url)}`;
+    const proxyUrl = `/.netlify/functions/fetchmail?url=${encodeURIComponent(url)}`;
 
     const res = await fetch(proxyUrl);
     const data = await res.json();
