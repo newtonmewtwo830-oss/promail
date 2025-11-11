@@ -3,7 +3,6 @@ import fetch from "node-fetch";
 export const handler = async (event) => {
   try {
     const { url } = event.queryStringParameters;
-
     if (!url) {
       return {
         statusCode: 400,
@@ -13,25 +12,29 @@ export const handler = async (event) => {
 
     console.log("Fetching:", url);
 
-    const response = await fetch(url, {
+    // --- Primary request directly ---
+    let response = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Netlify Function)",
+        "User-Agent": "Mozilla/5.0 (Netlify Proxy)",
         "Accept": "application/json,text/plain,*/*",
       },
     });
 
-    const contentType = response.headers.get("content-type") || "";
-    let data;
+    // --- Fallback if blocked (1secmail returns HTML or fails) ---
+    if (!response.ok || response.status >= 400) {
+      console.warn("Primary fetch failed, trying fallback proxy...");
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      response = await fetch(proxyUrl);
+    }
 
-    if (contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-      console.warn("Non-JSON response:", text.substring(0, 200));
-      return {
-        statusCode: 502,
-        body: JSON.stringify({ error: "Invalid response from target server" }),
-      };
+    const text = await response.text();
+
+    // --- Try to parse JSON, fallback to plain text ---
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      body = { raw: text };
     }
 
     return {
@@ -40,7 +43,7 @@ export const handler = async (event) => {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     };
   } catch (err) {
     console.error("Proxy error:", err.message);
